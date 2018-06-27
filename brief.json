@@ -1,0 +1,7 @@
+{
+  "description": "Coverage module",
+  "name": "coverage",
+  "path": "dist",
+  "version": "0.0.1",
+  "author": "Nery Jr & Bruno Machado"
+}

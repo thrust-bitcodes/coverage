@@ -1,0 +1,8 @@
+{
+  "description": "Coverage tests",
+  "name": "coverage-test",
+  "author": "Bruno Machado",
+  "dependencies": [
+    "majesty"
+  ]
+}
