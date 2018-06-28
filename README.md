@@ -12,15 +12,13 @@ thrust install coverage
 ```
 
 ## Tutorial
-
-Primeiro vamos configurar nosso arquivo de testes para que o coverage dos testes seja contabilizado, como mostrado abaixo:
-
 ```javascript
 let majesty = require('majesty')
 let coverage = require('coverage')
 
 function exec (describe, it, beforeEach, afterEach, expect, should, assert) {
     let equals = require('./utils/equals')
+    let ignored = require('./utils/ignored')
 
     describe("Testando coverage de testes", function () {
         it("Executando função simples", function () {
@@ -35,7 +33,11 @@ function exec (describe, it, beforeEach, afterEach, expect, should, assert) {
     });
 }
 
-coverage.init()
+coverage.init({ /* Optional */
+    ignore: [ 
+        'utils/ignored.js'
+    ]
+})
 
 let res = majesty.run(exec)
 
@@ -43,6 +45,9 @@ coverage.report()
 
 exit(res.failure.length)
 ```
+
+É possível ignorar instruções do código na cobertura, assim a instrução não será contabilizada negativamente caso não executada.
+Para isso, comente acima da linha com `/* coverage ignore (next|if|else) */`, vide arquivos de teste para exemplos.
 
 ## API
 
@@ -52,8 +57,9 @@ exit(res.failure.length)
 * Todo require realizado após a chamada deste método será instrumentado em runtime,
 * para que então a cobertura possa ser calculada.
 * @code coverage.init()
+* @param options.ignore array lista com os arquivos a serem desconsiderados na execução da cobertura (Arquivos .json e dentro da pasta .lib são sempre ignorados)
 */
-function init()
+function init(options)
 
 /**
 * Retorna a cobertura média da execução.

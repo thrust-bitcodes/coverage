@@ -1,7 +1,8 @@
 let defaults = require('../defaults')
+let fs = require('fs');
 
-function writeReport(coverageSummary) {
-    let watermarks = defaults.watermarks()
+function writeReport(coverageSummary, options) {
+    let watermarks = defaults.watermarks(options)
 
     let lines = []
 
@@ -20,7 +21,13 @@ function writeReport(coverageSummary) {
 
     lines.push('================================================================================');
 
-    console.log(lines.join('\n'));
+    if (options && options.file) {
+        fs.write(options.file, lines.join('\n'))
+    } else {
+        console.log(lines.join('\n'));
+    }
+
+    
 }
 
 function lineForKey(summary, key, watermarks) {

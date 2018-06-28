@@ -1,3 +1,5 @@
+let Paths = Java.type('java.nio.file.Paths')
+
 let fs = require('fs')
 let Instrumenter = require("./instrumenter")
 let lcovReporter = require('./reporters/lcovonly')
@@ -6,23 +8,36 @@ let utils = require('./object-utils')
 
 let instrumenter = new Instrumenter()
 
+const DEFAULT_IGNORED = ['.lib/**', '*.json'];
+
 /**
 * Inicializa o sistema de coverage em runtime.
 * Todo require realizado após a chamada deste método será instrumentado em runtime,
 * para que então a cobertura possa ser calculada.
 * @code coverage.init()
 */
-function init() {
-    dangerouslyLoadToGlobal('$coverageData', {});
+function init(options) {
+    dangerouslyLoadToGlobal('$coverageData', {})
+
+    let jFs = java.nio.file.FileSystems.getDefault()
+
+    let ignoreMatchers = DEFAULT_IGNORED.concat((options && options.ignore) || [])
+        .map(function (pattern) {
+            return jFs.getPathMatcher('glob:' + pattern);
+        })
 
     require.addInterceptor(function (path, content) {
-        if (path.indexOf('.json') > -1) {
-            return content;
-        } else if (path.indexOf('.lib/bitcodes') > -1) {
+        let localPath = Paths.get(rootPath).relativize(Paths.get(path))
+
+        let excludeFile = ignoreMatchers.find(function (matcher) {
+            return matcher.matches(localPath)
+        })
+
+        if (excludeFile) {
             return content;
         }
 
-        return instrumenter.instrumentSync(content, path);
+        return instrumenter.instrumentSync(content, path)
     });
 }
 
@@ -31,15 +46,15 @@ function init() {
 * coverage/lcov.info
 * @code coverage.report()
 */
-function report() {
-    let finalSummary = getExecSummary();
+function report(options) {
+    let finalSummary = getExecSummary()
 
     let coverageFile = new java.io.File('coverage', 'lcov.info').getPath()
 
-    lcovReporter.writeReport($coverageData, coverageFile)
-    textSummaryReporter.writeReport(finalSummary);
+    lcovReporter.writeReport($coverageData, coverageFile, options && options.lcov)
+    textSummaryReporter.writeReport(finalSummary, options && options.console)
 
-    return finalSummary.average.pct;
+    return finalSummary.average.pct
 }
 
 /**
@@ -47,7 +62,7 @@ function report() {
 * @code coverage.getAverageCoverage()
 */
 function getAverageCoverage() {
-    return getExecSummary().average.pct;
+    return getExecSummary().average.pct
 }
 
 function getExecSummary() {

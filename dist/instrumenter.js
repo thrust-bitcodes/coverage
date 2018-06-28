@@ -13,7 +13,7 @@
         crypto = null,
         LEADER_WRAP = '(function () { ',
         TRAILER_WRAP = '\n}());',
-        COMMENT_RE = /^\s*istanbul\s+ignore\s+(if|else|next)(?=\W|$)/,
+        COMMENT_RE = /^\s*coverage\s+ignore\s+(if|else|next)(?=\W|$)/,
         astgen,
         preconditions,
         cond,
