@@ -23,7 +23,7 @@ function exec(describe, it, beforeEach, afterEach, expect, should, assert) {
 
     describe("Gerando reports de coverage", function () {
         it("Testando saida do coverage", function () {
-            // expect(coverage.getAverageCoverage()).to.be.gte(100)
+            expect(coverage.getAverageCoverage()).to.be.gte(100)
         });
     });
 }

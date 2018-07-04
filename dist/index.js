@@ -1,4 +1,6 @@
 let Paths = Java.type('java.nio.file.Paths')
+let FileSystems = Java.type('java.nio.file.FileSystems')
+let File = Java.type('java.io.File')
 
 let fs = require('fs')
 let Instrumenter = require("./instrumenter")
@@ -19,7 +21,7 @@ const DEFAULT_IGNORED = ['.lib/**', '*.json'];
 function init(options) {
     dangerouslyLoadToGlobal('$coverageData', {})
 
-    let jFs = java.nio.file.FileSystems.getDefault()
+    let jFs = FileSystems.getDefault()
 
     let ignoreMatchers = DEFAULT_IGNORED.concat((options && options.ignore) || [])
         .map(function (pattern) {
@@ -49,7 +51,7 @@ function init(options) {
 function report(options) {
     let finalSummary = getExecSummary()
 
-    let coverageFile = new java.io.File('coverage', 'lcov.info').getPath()
+    let coverageFile = new File('coverage', 'lcov.info').getPath()
 
     lcovReporter.writeReport($coverageData, coverageFile, options && options.lcov)
     textSummaryReporter.writeReport(finalSummary, options && options.console)
